@@ -1,0 +1,25 @@
+#!/bin/sh
+shout() { echo "package/upgrade: $*" >&2; }
+barf() { shout "fatal: $*"; exit 111; }
+
+#### MAIN
+
+test -d package || barf "no package directory"
+test -d compile || barf "no compile directory"
+
+if test 0 -eq $#
+then
+  exec package/create compile src make \
+    `awk '$1{print $1".install"}' < src/build=d`
+fi
+
+exec package/create compile src make `awk '
+  BEGIN {
+    for (i = 1;i < ARGC;++i)
+      print ARGV[i]".install"
+    exit 0
+  }
+' "$@"`
+
+barf "cannot upgrade $*"
+

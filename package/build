@@ -1,0 +1,49 @@
+#!/bin/sh
+shout() { echo "package/build: $*" >&2; }
+barf() { shout "fatal: $*"; exit 111; }
+safe() { "$@" || barf "cannot $*"; }
+usage() {
+  shout "usage: package/build [ --help -F ] [ opts target ... ]"
+  exit 100
+}
+
+
+#### MAIN
+
+test -d package || barf "no package directory"
+
+remove=""
+while test $# -gt 0
+do
+  case "$1" in
+    -F)
+      remove="-F"
+      shift
+      ;;
+    --)
+      shift
+      break
+      ;;
+    -*)
+      usage
+      ;;
+    *)
+      break
+      ;;
+  esac
+done
+
+here="`env - PATH=$PATH pwd`"
+
+if test 0 -eq $#
+then
+  exec package/create $remove compile src build target \
+    `awk '$1{print $1}' < src/build=d`
+fi
+
+exec package/create $remove compile src build target "$@"
+
+barf "cannot build $*"
+
+exit 0
+

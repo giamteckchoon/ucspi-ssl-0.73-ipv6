@@ -1,0 +1,7 @@
+Setup examples.
+Options for looser verification.
+Program like stunnel.
+Rules tests.
+SSL connection caching.
+Replace mconnect-io use in sslconnect.
+Restructure auto-foo.c as foo.autostr.c under default.autostr.c.
