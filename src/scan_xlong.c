@@ -10,7 +10,7 @@ static int fromhex(unsigned char c) {
   return -1;
 }
 
-unsigned int scan_xlong(char *src,unsigned long *dest) {
+unsigned int scan_xlong(const char *src,unsigned long *dest) {
   register const char *tmp=src;
   register int l=0;
   register unsigned char c;
