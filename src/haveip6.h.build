@@ -1,0 +1,2 @@
+build_ifchanged choose compile load tryip6.c haveip6.h1 haveip6.h2
+./choose cl tryip6 haveip6.h1 haveip6.h2

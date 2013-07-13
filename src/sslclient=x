@@ -1,5 +1,5 @@
-remoteinfo.o
-timeoutconn.o
+remoteinfo6.o
+timeoutconn6.o
 ssl.a
 unix.a
 auto_cafile.o

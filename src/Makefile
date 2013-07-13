@@ -457,6 +457,7 @@ dns_rcip.c \
 openreadclose.h \
 byte.h \
 ip4.h \
+ip6.h \
 env.h \
 gen_alloc.h \
 stralloc.h \
@@ -524,6 +525,7 @@ uint16.h \
 gen_alloc.h \
 stralloc.h \
 iopause.h \
+uint32.h \
 uint64.h \
 tai.h \
 taia.h \
@@ -902,8 +904,31 @@ timeoutconn.h \
 gen_alloc.h \
 stralloc.h \
 uint16.h \
+uint32.h \
 remoteinfo.h
 	sh makefile.build ./default.o.build remoteinfo.o remoteinfo
+
+remoteinfo6.o: \
+default.o.build \
+compile \
+remoteinfo6.c \
+fmt.h \
+buffer.h \
+socket.h \
+uint16.h \
+error.h \
+iopause.h \
+taia.h \
+tai.h \
+uint64.h \
+timeoutconn.h \
+uint16.h \
+remoteinfo.h \
+stralloc.h \
+gen_alloc.h \
+uint16.h \
+uint32.h
+	sh makefile.build ./default.o.build remoteinfo6.o remoteinfo6
 
 rules.o: \
 default.o.build \
@@ -1001,6 +1026,7 @@ compile \
 socket_accept.c \
 byte.h \
 uint16.h \
+uint32.h \
 socket.h
 	sh makefile.build ./default.o.build socket_accept.o socket_accept
 
@@ -1010,6 +1036,7 @@ compile \
 socket_bind.c \
 byte.h \
 uint16.h \
+uint32.h \
 socket.h
 	sh makefile.build ./default.o.build socket_bind.o socket_bind
 
@@ -1019,6 +1046,7 @@ compile \
 socket_conn.c \
 byte.h \
 uint16.h \
+uint32.h \
 socket.h
 	sh makefile.build ./default.o.build socket_conn.o socket_conn
 
@@ -1027,6 +1055,7 @@ default.o.build \
 compile \
 socket_delay.c \
 uint16.h \
+uint32.h \
 socket.h
 	sh makefile.build ./default.o.build socket_delay.o socket_delay
 
@@ -1035,6 +1064,7 @@ default.o.build \
 compile \
 socket_listen.c \
 uint16.h \
+uint32.h \
 socket.h
 	sh makefile.build ./default.o.build socket_listen.o socket_listen
 
@@ -1052,6 +1082,7 @@ default.o.build \
 compile \
 socket_opts.c \
 uint16.h \
+uint32.h \
 socket.h
 	sh makefile.build ./default.o.build socket_opts.o socket_opts
 
@@ -1061,6 +1092,7 @@ compile \
 socket_remote.c \
 byte.h \
 uint16.h \
+uint32.h \
 socket.h
 	sh makefile.build ./default.o.build socket_remote.o socket_remote
 
@@ -1070,6 +1102,7 @@ compile \
 socket_tcp.c \
 ndelay.h \
 uint16.h \
+uint32.h \
 socket.h
 	sh makefile.build ./default.o.build socket_tcp.o socket_tcp
 
@@ -1079,6 +1112,7 @@ compile \
 socket_udp.c \
 ndelay.h \
 uint16.h \
+uint32.h \
 socket.h
 	sh makefile.build ./default.o.build socket_udp.o socket_udp
 
@@ -1264,8 +1298,8 @@ default.build \
 sslclient=x \
 load \
 sslclient.o \
-remoteinfo.o \
-timeoutconn.o \
+remoteinfo6.o \
+timeoutconn6.o \
 ssl.a \
 unix.a \
 auto_cafile.o \
@@ -1288,6 +1322,7 @@ fmt.h \
 scan.h \
 str.h \
 ip4.h \
+ip6.h \
 socket.h \
 fd.h \
 buffer.h \
@@ -1301,6 +1336,7 @@ remoteinfo.h \
 gen_alloc.h \
 stralloc.h \
 iopause.h \
+uint32.h \
 uint64.h \
 tai.h \
 taia.h \
@@ -1332,6 +1368,7 @@ byte.h \
 fmt.h \
 scan.h \
 ip4.h \
+ip6.h \
 fd.h \
 exit.h \
 env.h \
@@ -1471,8 +1508,8 @@ auto_certfile.o \
 auto_keyfile.o \
 auto_ciphers.o \
 rules.o \
-remoteinfo.o \
-timeoutconn.o \
+remoteinfo6.o \
+timeoutconn6.o \
 cdb.a \
 ssl.a \
 unix.a \
@@ -1490,6 +1527,7 @@ byte.h \
 fmt.h \
 scan.h \
 ip4.h \
+ip6.h \
 fd.h \
 exit.h \
 env.h \
@@ -1513,6 +1551,7 @@ sig.h \
 gen_alloc.h \
 stralloc.h \
 iopause.h \
+uint32.h \
 uint64.h \
 tai.h \
 taia.h \
@@ -1753,8 +1792,26 @@ taia.h \
 iopause.h \
 error.h \
 uint16.h \
+uint32.h \
 timeoutconn.h
 	sh makefile.build ./default.o.build timeoutconn.o timeoutconn
+
+timeoutconn6.o: \
+default.o.build \
+compile \
+timeoutconn6.c \
+ndelay.h \
+socket.h \
+uint16.h \
+iopause.h \
+taia.h \
+tai.h \
+uint16.h \
+uint32.h \
+uint64.h \
+error.h \
+timeoutconn.h
+	sh makefile.build ./default.o.build timeoutconn6.o timeoutconn6
 
 uint16_pack.o: \
 default.o.build \
@@ -1912,7 +1969,30 @@ dns_transmit.o \
 dns_txt.o \
 lock_ex.o \
 lock_un.o \
-coe.o
+coe.o \
+socket_conn6.o \
+socket_bind6.o \
+socket_accept6.o \
+socket_recv6.o \
+socket_send6.o \
+socket_local6.o \
+socket_remote6.o \
+socket_tcp6.o \
+socket_getifname.o \
+socket_getifidx.o \
+socket_v4mappedprefix.o \
+socket_ip4loopback.o \
+socket_v6any.o \
+socket_v6loopback.o \
+socket_udp6.o \
+scan_ip6.o \
+ip6_fmt.o \
+scan_xlong.o \
+fmt_xlong.o \
+dns_ip6.o \
+dns_sortip6.o \
+dns_nd6.o \
+dns_ipq6.o
 	sh makefile.build ./default.a.build unix.a unix
 
 wait_nohang.o: \
@@ -1929,3 +2009,254 @@ wait_pid.c \
 error.h \
 haswaitp.h
 	sh makefile.build ./default.o.build wait_pid.o wait_pid
+
+socket_conn6.o: \
+default.o.build \
+compile \
+socket_conn6.c \
+socket.h \
+uint16.h \
+haveip6.h \
+error.h \
+ip6.h \
+uint32.h
+	sh makefile.build ./default.o.build socket_conn6.o socket_conn6
+
+socket_bind6.o: \
+default.o.build \
+compile \
+socket_bind6.c \
+socket.h \
+uint16.h \
+haveip6.h \
+error.h \
+ip6.h \
+uint32.h
+	sh makefile.build ./default.o.build socket_bind6.o socket_bind6
+
+socket_accept6.o: \
+default.o.build \
+compile \
+socket_accept6.c \
+socket.h \
+uint16.h \
+haveip6.h \
+error.h \
+ip6.h \
+uint32.h
+	sh makefile.build ./default.o.build socket_accept6.o socket_accept6
+
+socket_recv6.o: \
+default.o.build \
+compile \
+socket_recv6.c \
+socket.h \
+uint16.h \
+haveip6.h \
+error.h \
+ip6.h \
+uint32.h
+	sh makefile.build ./default.o.build socket_recv6.o socket_recv6
+
+socket_send6.o: \
+default.o.build \
+compile \
+socket_send6.c \
+socket.h \
+uint16.h \
+haveip6.h \
+error.h \
+uint32.h
+	sh makefile.build ./default.o.build socket_send6.o socket_send6
+
+socket_local6.o: \
+default.o.build \
+compile \
+socket_local6.c \
+socket.h \
+uint16.h \
+haveip6.h \
+error.h \
+uint32.h
+	sh makefile.build ./default.o.build socket_local6.o socket_local6
+
+socket_remote6.o: \
+default.o.build \
+compile \
+socket_remote6.c \
+socket.h \
+uint16.h \
+haveip6.h \
+error.h \
+uint32.h
+	sh makefile.build ./default.o.build socket_remote6.o socket_remote6
+
+dns_sortip6.o: \
+default.o.build \
+compile \
+dns_sortip6.c \
+byte.h \
+dns.h \
+stralloc.h \
+gen_alloc.h \
+iopause.h \
+taia.h \
+tai.h \
+uint64.h \
+taia.h
+	sh makefile.build ./default.o.build dns_sortip6.o dns_sortip6
+
+dns_nd6.o: \
+default.o.build \
+compile \
+dns_nd6.c \
+byte.h \
+fmt.h \
+dns.h \
+stralloc.h \
+gen_alloc.h \
+iopause.h \
+taia.h \
+tai.h \
+uint64.h \
+taia.h
+	sh makefile.build ./default.o.build dns_nd6.o dns_nd6
+
+dns_ipq6.o: \
+default.o.build \
+compile \
+dns_ipq6.c \
+stralloc.h \
+gen_alloc.h \
+case.h \
+byte.h \
+str.h \
+dns.h \
+stralloc.h \
+iopause.h \
+taia.h \
+tai.h \
+uint64.h \
+taia.h \
+ip6.h
+	sh makefile.build ./default.o.build dns_ipq6.o dns_ipq6
+
+dns_ip6.o: \
+default.o.build \
+compile \
+dns_ip6.c \
+stralloc.h \
+gen_alloc.h \
+uint16.h \
+byte.h \
+dns.h \
+stralloc.h \
+iopause.h \
+taia.h \
+tai.h \
+uint64.h \
+taia.h
+	sh makefile.build ./default.o.build dns_ip6.o dns_ip6
+
+fmt_xlong.o: \
+default.o.build \
+compile \
+fmt_xlong.c \
+scan.h
+	sh makefile.build ./default.o.build fmt_xlong.o fmt_xlong
+
+scan_xlong.o: \
+default.o.build \
+compile \
+scan_xlong.c \
+scan.h
+	sh makefile.build ./default.o.build scan_xlong.o scan_xlong
+
+ip6_fmt.o: \
+default.o.build \
+compile \
+ip6_fmt.c \
+fmt.h \
+ip6.h
+	sh makefile.build ./default.o.build ip6_fmt.o ip6_fmt
+
+scan_ip6.o: \
+default.o.build \
+compile \
+scan_ip6.c \
+scan.h \
+ip6.h
+	sh makefile.build ./default.o.build scan_ip6.o scan_ip6
+
+socket_tcp6.o: \
+default.o.build \
+compile \
+socket_tcp6.c \
+ndelay.h \
+socket.h \
+uint16.h \
+haveip6.h \
+uint32.h
+	sh makefile.build ./default.o.build socket_tcp6.o socket_tcp6
+
+socket_udp6.o: \
+default.o.build \
+compile \
+socket_udp6.c \
+ndelay.h \
+socket.h \
+uint16.h \
+haveip6.h \
+uint32.h
+	sh makefile.build ./default.o.build socket_udp6.o socket_udp6
+
+haveip6.h: \
+haveip6.h.build \
+choose \
+compile \
+tryip6.c \
+haveip6.h1 \
+haveip6.h2
+	sh makefile.build ./haveip6.h.build haveip6.h
+
+socket_getifname.o: \
+default.o.build \
+compile \
+socket_getifname.c \
+socket.h \
+uint16.h \
+uint32.h
+	sh makefile.build ./default.o.build socket_getifname.o socket_getifname
+
+socket_getifidx.o: \
+default.o.build \
+compile \
+socket_getifidx.c \
+socket.h \
+uint16.h \
+uint32.h
+	sh makefile.build ./default.o.build socket_getifidx.o socket_getifidx
+
+socket_ip4loopback.o: \
+default.o.build \
+compile \
+socket_ip4loopback.c
+	sh makefile.build ./default.o.build socket_ip4loopback.o socket_ip4loopback
+
+socket_v4mappedprefix.o: \
+default.o.build \
+compile \
+socket_v4mappedprefix.c
+	sh makefile.build ./default.o.build socket_v4mappedprefix.o socket_v4mappedprefix
+
+socket_v6any.o: \
+default.o.build \
+compile \
+socket_v6any.c
+	sh makefile.build ./default.o.build socket_v6any.o socket_v6any
+
+socket_v6loopback.o: \
+default.o.build \
+compile \
+socket_v6loopback.c
+	sh makefile.build ./default.o.build socket_v6loopback.o socket_v6loopback

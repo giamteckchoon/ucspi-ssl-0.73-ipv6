@@ -6,8 +6,8 @@ auto_certfile.o
 auto_keyfile.o
 auto_ciphers.o
 rules.o
-remoteinfo.o
-timeoutconn.o
+remoteinfo6.o
+timeoutconn6.o
 cdb.a
 ssl.a
 unix.a
