@@ -1,10 +1,10 @@
 #include <unistd.h>
 #include "taia.h"
-#include "env.h"
 #include "byte.h"
 #include "str.h"
 #include "openreadclose.h"
 #include "dns.h"
+#include "env.h"
 
 static stralloc data = {0};
 
