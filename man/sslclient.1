@@ -1,0 +1,229 @@
+.TH sslclient 1
+.SH NAME
+sslclient \- setup a TLS client connection
+.SH SYNOPSIS
+.B sslclient
+[
+.I opts
+]
+.I host
+.I port
+.I prog
+.SH DESCRIPTION
+.I opts
+is a series of getopt-style options,
+.I host
+is a host name for the client to connect to, and
+.I prog
+is one or more arguments specifying a program to run
+for each successful connection.
+
+.B sslclient
+attempts to connect to a TCP server at
+.I host
+.IR port .
+If the connection succeeds,
+.B sslclient
+runs
+.IR prog ,
+with file descriptors 6 and 7 reading from and
+writing to a child process ssl.
+The ssl process attempts an SSL connect via the network.
+If it succeeds, it translates data between
+.I prog
+and the network, performing any necessary SSL encoding and decoding.
+
+Before running
+.I prog,
+.B sslclient
+sets certain environment variables.
+
+.SH OPTIONS
+.B General Options:
+.TP
+.B \-q
+Quiet. Do not print error messages.
+.TP
+.B \-Q
+(Default.) Print error messages.
+.TP
+.B \-v
+Verbose. Print error messages and status messages.
+.P
+.B Connection options:
+.TP
+.B \-4
+Fall back to IPv4 sockets. This is necessary for terminally broken
+systems like OpenBSD which will not let IPv6 sockets connect to
+V4-mapped IPv6 addresses. Please note that this also applies to DNS
+lookups, so you will have to use an DNS resolver with an IPv6 address to
+connect to IPv6 systems. Use \fBDNSCACHEIP\fR to set the DNS resolver
+IP dynamically.
+.TP
+.B \-6
+Force IPv6 mode in UCSPI environment variables, even for
+IPv4 connections. This will set \fB$PROTO\fR to \fBSSL6\fR and put
+IPv4-mapped IPv6 addresses in \fBSSLLOCALIP\fR and \fBSSLREMOTEIP\fR.
+.TP
+.B \-T \fIx+y
+Give up on the connection attempt or SSL connection attempt after
+.I x+y
+seconds. The default value is: 2+58. When a
+.I host
+has several IP addresses,
+.B sslclient
+tries to connect to the first IP address, waits
+.I x
+seconds, tries to connect to the second IP address, waits
+- Ix
+seconds, etc.; then it retries each address that timed out, waiting
+.I y
+seconds per address. You may omit
+.I +y
+to skip the second try.
+.TP
+.B \-i \fIlocalip
+Use
+.I localip
+as the IP address for the local side of the connection; quit if
+.I localip
+is not available. Normally
+.B sslclient
+lets the operating system choose an address.
+.TP
+.B \-p \fIlocalport
+Use
+.I localport
+as the TCP port for the local side of the connection; quit if
+.I localport
+is not available. Normally
+.B sslclient
+lets the operating system choose a port .
+.TP
+.B \-d
+Delay sending data for a fraction of a second whenever
+the remote host is responding slowly.
+This is currently the default, but it may not be in the future;
+if you want it, set it explicitly.
+.TP
+.B \-D
+Never delay sending data; enable TCP_NODELAY.
+.TP
+.B \-Z\fIinterface
+Use
+.I interface
+as the local network interface. This is only defined for IPv6 sockets
+and needed if you use link-local IPv6 addresses.
+
+.P
+.B X509 certificate handling:
+.TP
+.B \-3
+Read a null-terminated
+.I key password
+from file descriptor 3.
+.TP
+.B \-a \fIcafile
+Override the compiled-in CA file name.
+The CA file contains the list of CAs used to verify the server certificate.
+.TP
+.B \-A \fIcadir
+Override the compiled-in CA directory name.
+The CA directory contains certificates files used
+to verify the client certificate. This list augments the list from
+.I \-a \fIcafile.
+.TP
+.B \-c \fIcertfile
+Use the client certificate in
+.IR certfile .
+.TP
+.B \-k \fIkeyfile
+Use the client certificate key in
+.IR keyfile .
+.TP
+.B \-V \fIverifydepth
+Verify the server certificate chain to depth
+.IR verifydepth .
+The default value is 1.
+.TP
+.B \-z \fIciphers
+Use the cipher list specified in
+.IR ciphers .
+.TP
+.B \-x
+(Default.) Verify the server certificate.
+.TP
+.B \-X
+Do not verify the server certificate.
+.TP
+.B \-n
+(Default.) Verify that the server host name matches
+the FQDN provided in the certificate.
+.TP
+.B \-N
+Do not verify that the server host name matches
+the FQDN provided in the certificate.
+
+.P
+.B Data-gathering options:
+.TP
+.B \-h
+(Default.) Look up the remote host name in DNS
+to set the environment variable $SSLREMOTEHOST.
+.TP
+.B \-H
+Do not look up the remote host name in DNS;
+remove the environment variable $SSLREMOTEHOST.
+.TP
+.B \-l \fIlocalname
+Do not look up the local host name in DNS; use
+.I localname
+for the environment variable $SSLLOCALHOST.
+A common choice for
+.I localname
+is 0.
+.TP
+.B \-r
+Attempt to obtain $SSLREMOTEINFO from the remote host.
+.TP
+.B \-R
+(Default.) Do not attempt to obtain $SSLREMOTEINFO from the remote host.
+.TP
+.B \-t \fIn
+Give up on the $SSLREMOTEINFO connection attempt after
+.I n
+seconds. The default value is: 26.
+.TP
+.B \-w \fIn
+Give up on a connection or program after waiting
+.I n
+seconds for read or write. The default value is: 3600.
+.TP
+.B \-s
+Store client and server certificate information in the environment, a la mod_ssl.
+.TP
+.B \-S
+(Default.) Do not store client and server certificate information in the environment.
+.TP
+.B \-e
+Set protocol environment a la
+.BR tcpserver .
+Set $TCPLOCALIP, $TCPLOCALPORT, $TCPLOCALHOST, $TCPREMOTEIP,
+$TCPREMOTEPORT, $TCPREMOTEHOST, and $TCPREMOTEINFO
+from the corresponding $SSL variables.
+.TP
+.B \-E
+(Default.) Do not set any
+.B tcpserver
+environment variables.
+
+.SH SEE ALSO
+sslserver(1),
+sslconnect(1),
+sslcat(1),
+https@(1),
+ucspi-tls(2),
+tcp-environ(5).
+
+http://www.superscript.com/ucspi-ssl/sslclient.html
+http://httpd.apache.org/docs/2.0/mod/mod_ssl.html

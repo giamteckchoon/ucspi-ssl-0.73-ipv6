@@ -1,0 +1,63 @@
+.TH ucspi-tls 2
+.SH NAME
+UCSPI-TLS \- advanced and secure communication between server and prog
+.SH DESCRIPTON
+A
+.B UCSPI-TLS
+enhanced server makes optional SSL services available to the
+client by providing three file descriptors: a
+.I control socket,
+a
+.I reading pipe,
+and a
+.I writing pipe.
+
+The file descriptor number of the control socket will be in the
+environment variable $SSLCTLFD.
+
+The file descriptor number of the reading pipe will be in the
+environment variable $SSLREADFD, and the file descriptor number of the
+writing pipe will be in the environment variable $SSLWRITEFD.
+
+It's possible for all three of these file descriptors to be the same.
+
+.SH USAGE
+.B UCSPI-TLS
+provides standard IN and OUT (file descriptors 0 and 1)
+to connected directly to the socket, for unencrypted communication.
+
+The
+.I control socket
+must accept at least these two commands:
+.TP
+.B y
+Start TLS.
+.TP
+.B Y
+Start TLS, and send optional SSL connection information
+back over the control socket.
+.P
+The SSL connection information will be in the in the form of an
+environment string, with zero or more environment variables,
+terminated by two ASCII NULL's.  Each environment variable is stored
+as "VAR=val\0", and an additional trailing \0 is used to indicate
+the end of all environment variables.  If there are no variables to
+set, "\0\0" should be used.
+
+When TLS is started, the
+.B UCSPI-TLS
+enabled server will take control of the socket,
+and the application is expected to switch to the file descriptors in
+$SSLREADFD and $SSLWRITEFD for all future communications.
+Using the regular socket after activating TLS will
+probably just confuse the client.
+
+.SH SEE ALSO
+Where possible, the environment variables set should be the same
+ones as Apache's
+.I mod_ssl:
+
+http://httpd.apache.org/docs-2.0/mod/mod_ssl.html
+
+.SH CREDITS
+Scott Gifford, Charlie Brady

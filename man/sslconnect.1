@@ -1,0 +1,49 @@
+.TH sslconnect 1
+.SH sslconnect
+sslconnect \- simple sslclient with verbose output
+.SH SYNOPSIS
+.B sslconnect
+[
+.I host
+.I port
+.I args
+]
+.SH DESCRIPTION
+.B sslconnect
+connects to
+.I host on
+.I port
+via TCP, and attempts an SSL connection.
+It sends its standard input to the server,
+printing a CR after each LF, and prints any data
+it receives from the server to standard output.
+.B sslconnect
+can be used to fetch binary data.
+It does no conversion other than SSL encoding and decoding on received data.
+
+If
+.I host
+is not supplied,
+.B sslconnect
+connects to the local host.
+
+If
+.I port
+is not supplied,
+.B sslconnect
+uses TCP port 443 (HTTPS).
+
+If
+.I args
+are supplied, they are passed to
+.B sslclient
+unmodified.
+
+.SH SEE ALSO
+sslserver(1),
+sslclient(1),
+sslcat(1),
+https@(1),
+tcp-environ(5).
+
+http://www.superscript.com/ucspi-ssl/sslcat.html

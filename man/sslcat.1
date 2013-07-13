@@ -1,0 +1,50 @@
+.TH sslcat  1
+.SH sslcat
+sslcat \- simple ssl upload of a file with verbose output
+.SH SYNOPSIS
+.B sslcat
+[G
+.I host
+.I port
+.I args
+]
+.SH DESCRIPTION
+.B sslcat
+connects to
+.I host
+on
+.I port
+via TCP, and then attempts an SSL connection while
+sending the data available on file descriptor 6
+to the server.
+It prints any data it receives.
+.B sslcat
+can be used to transfer binary data.
+It does no conversion other than SSL encoding and decoding.
+
+If
+.I port
+is not supplied,
+.B sslcat
+uses TCP port 443 (HTTPS).
+
+If
+.I host
+is not supplied,
+.B sslcat
+connects to the local host.
+
+If
+.I args
+are supplied, they are passed to
+.B sslclient
+unmodified.
+
+.SH SEE ALSO
+sslserver(1),
+sslclient(1),
+sslcat(1),
+https@(1),
+tcp-environ(5).
+
+http://www.superscript.com/ucspi-ssl/sslcat.html

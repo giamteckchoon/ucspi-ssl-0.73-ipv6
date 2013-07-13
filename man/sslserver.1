@@ -1,0 +1,455 @@
+.TH sslserver 1
+.SH NAME
+sslserver \- accept TLS connections and setup SSL CTX
+.SH SYNOPSIS
+.B sslserver
+[
+.I opts
+]
+.I host
+.I port
+.I prog
+.SH DESCRIPTION
+.I opts
+is a series of getopt-style options,
+.I host
+is a host name or IP address,
+.I port
+is a TCP port, and
+.I prog
+is one or more arguments specifying a program
+to run for each accepted connection.
+
+.B sslserver
+listens for connections from TCP clients.
+Typically, for each connection, it runs
+.IR prog ,
+with file descriptor 0 reading from,
+and file descriptor 1 writing to a child process
+.IR ssl .
+If however
+.B sslserver
+is called with the option
+.IR \-n ,
+it communcates with
+.I prog
+on mutually chosen, arbitrary file descriptors.
+.I prog
+needs to support the UCSPI-TLS API.
+The
+.I ssl
+process attempts an SSL accept via the network.
+If it succeeds, it translates data between
+.I prog
+and the network, performing any necessary SSL encoding and decoding.
+Before running
+.IR prog ,
+.B sslserver
+reads and sets certain environment variables.
+
+.B sslserver
+exits when it receives SIGTERM.
+
+.SH OPTIONS
+.B General Options:
+.TP
+.B \-q
+Quiet. Do not print error messages.
+.TP
+.B \-Q
+(Default.) Print error messages.
+.TP
+.B \-v
+Verbose. Print error messages and status messages.
+
+.P
+.B Connection options:
+.TP
+.B \-1
+After preparing to receive connections,
+print the local port number to standard output.
+.TP
+.B \-4
+Fall back to IPv4 sockets.  This is necessary for terminally broken
+systems like OpenBSD which will not let IPv6 sockets connect to
+V4-mapped IPv6 addresses.  Please note that this also applies to DNS
+lookups, so you will have to use an DNS resolver with an IPv6 address to
+accept IPv6 connections.  Use \fBDNSCACHEIP\fR to set the DNS resolver
+IP dynamically.
+.TP
+.B \-6
+Force IPv6 mode in UCSPI environment variables, even for
+IPv4 connections.  This will set \fB$PROTO\fR to \fBSSL6\fR and put
+IPv4-mapped IPv6 addresses in \fBSSLLOCALIP\fR and \fBSSLREMOTEIP\fR.
+.TP
+.B \-c \fIn
+Do not handle more than
+.I n
+simultaneous connections.
+If there are
+.I n
+simultaneous connections copies of
+.I prog
+running, defer acceptance of a new connection until one copy finishes.
+.I n
+must be a positive integer. The default value is 40.
+.TP
+.B \-x \fIcdb
+Follow the rules compiled into
+.I cdb
+by
+.BR tcprules .
+These rules may specify setting environment variables
+or rejecting connections from bad sources.
+You can rerun
+.B tcprules
+to change the rules while
+.B sslserver
+is running.
+.TP
+.B \-X
+With
+.B \-x \fIcdb,
+allow connections even if
+.B \-I cdb
+does not exist. Normally
+.B sslserver
+will drop the connection if
+.I cdb
+does not exist.
+.TP
+.B \-B \fIbanner
+Write
+.I banner
+to the network immediately after each SSL connection is made. The
+.I banner
+is subject to SSL encryption.
+.TP
+.B \-g \fIgid
+Switch group ID to
+.I gid
+after preparing to receive connections.
+.I gid
+must be a positive integer.
+.TP
+.B \-u \fIuid
+Switch user ID to
+.I uid
+after preparing to receive connections.
+.I uid
+must be a positive integer.
+.TP
+.B \-U
+Same as
+.B \-g
+$GID
+.B \-u
+$UID. Typically, $GID and $UID are set by
+.BR envuidgid .
+.TP
+.B \-b \fIn
+Allow a backlog of approximately
+.I n
+pending connections.
+.TP
+.B \-o
+Leave IP options alone. If the client is sending packets
+along an IP source route, send packets back along the same route.
+.TP
+.B \-O
+(Default.) Kill IP options.
+A client can still use source routing to connect and to send data,
+but packets will be sent back along the default route.
+.TP
+.B \-d
+Delay sending data for a fraction of a second whenever the
+remote host is responding slowly. This is currently the default,
+but it may not be in the future; if you want it, set it explicitly.
+.TP
+.B \-D
+Never delay sending data; enable TCP_NODELAY.
+.TP
+.B \-t \fIn
+Give up on the $SSLREMOTEINFO connection attempt after
+.I n
+seconds. The default value is: 26.
+.TP
+.B \-T \fIn
+Give up on the SSL connection attempt after
+.IR n seconds.
+The default value is: 26.
+.TP
+.B \-w \fIn
+Give up on a connection or program after waiting
+.I n
+seconds for read or write. The default value is: 3600.
+.TP
+.B \-Z\fIinterface
+Bind to the network interface
+.I interface
+("eth0" on Linux, for example).  This is only defined and needed for
+IPv6 link-local addresses.
+
+.P
+.B SSL and TLS connection options:
+.TP
+.B \-n
+delay setup of SSL environment until a STARTTLS/STLS command
+has been issued by the client.
+.TP
+.B \-N
+(Default.) Setup the SSL environment immediately.
+.TP
+.B \-s
+Store client and server certificate information in the environment, a la
+.IR mod_ssl .
+.TP
+.B \-S
+(Default.) Do not store client and server certificate information in the environment.
+
+.P
+.B X509 certificate and encryption options:
+.TP
+.B \-3
+Read a null-terminated
+.I key password
+from file descriptor
+.IR 3 .
+.TP
+.B \-i
+Require valid client certificates.
+.TP
+.B \-I
+(Default.) Do not require client certificates.
+
+.P
+.B Data-gathering options:
+.TP
+.B \-h
+(Default.) Look up the remote host name in DNS to set the
+environment variable $SSLREMOTEHOST.
+In this case, additionally the CN in the X509 certificate is
+checked, provided, the option
+.B \-i
+is set.
+.TP
+.B \-H
+Do not look up the remote host name in DNS;
+remove the environment variable $SSLREMOTEHOST.
+To avoid loops, you must use this option for servers on TCP port 53.
+.TP
+.B \-p
+Paranoid. After looking up the remote host name in DNS,
+look up the IP addresses in DNS for that host name,
+and remove the environment variable  $SSLREMOTEHOST
+if none of the addresses match the clientds IP address.
+.TP
+.B \-P
+(Default.) Not paranoid.
+.TP
+.B \-l \fIlocalname
+Do not look up the local host name in DNS; use
+.I localname
+for the environment variable $SSLLOCALHOST.
+A common choice for
+.I localname
+is 0. To avoid loops, you must use this option for servers on TCP port 53.
+.TP
+.B \-r
+Attempt to obtain $SSLREMOTEINFO from the remote host.
+.TP
+.B \-R
+(Default.) Do not attempt to obtain $SSLREMOTEINFO from the remote host.
+To avoid loops, you must use this option for servers on TCP ports 53 and 113.
+.TP
+.B \-e
+Set protocol environment a la
+.BI tcpserver .
+Set $TCPLOCALIP, $TCPLOCALPORT, $TCPLOCALHOST, $TCPREMOTEIP,
+$TCPREMOTEPORT, $TCPREMOTEHOST, and $TCPREMOTEINFO from the
+current $SSL environment (see below).
+.TP
+.B \-E
+(Default.) Do not set any
+.B tcpserver
+environment variables.
+
+.P
+.B SSL environment variables read:
+.P
+These variables define the run-time environment of
+.B sslserver
+and are used to specify X509 certificates and keyfile per connection.
+.B $SSL_USER=\fIname
+The user, reading the certificates and keyfile.
+.TP
+.B $SSL_GROUP=\fIgroup
+The respective user group.
+.TP
+.B $SSL_UID=\fIuid
+The numerical UID of the $SSL_USER.
+.TP
+.B $SSL_CHROOT=\fIpath
+Perform reading of certificates and keyfile in a $SSL_CHROOT jail.
+.TP
+.B $CAFILE=\fIpath
+If set, overrides the compiled-in CA file name.
+The CA file contains the list of CAs used to verify the client certificate.
+Certificates in $CAFILE are processed when the server starts.
+.TP
+.B $CADIR=\fIpath
+If set, overrides the compiled-in CA directory name.
+The CA directory contains certificates files used to verify the client certificate.
+This list augments the list from $CAFILE.
+Certificates in $CADIR are processed during certificate verification.
+.TP
+.B $CCAFILE=\fIpath
+If set, overrides the compiled-in client CA file name for client certificate request.
+The client CA file contains the list of CAs sent to the client
+when requesting a client certificate.
+.I Note:
+Setting of $CCAFILE is required while using the option
+.I \-i.
+.TP
+.B $CCAVERIFY
+If set,
+.B sslserver
+requests a valid client certificate on a per-connection base, unlike the general
+option
+.IR \-i .
+.TP
+.B $CERTFILE=\fIpath
+If set, overrides the compiled-in certificate file name.
+The server presents this certificate to clients.
+.TP
+.B $DHFILE=\fIpath
+If set, overrides the compiled-in DH parameter file name.
+.TP
+.B $KEYFILE=\fIpath
+If set, overrides the compiled-in key file name.
+The key is used when loading the server certificate.
+Setting $KEYFILE to the empty instructs the server
+not to use a
+.I keyfile
+when loading it's certificate.
+.TP
+.B $VERIFYDEPTH=\fIn
+If set, overrides the compiled-in verification depth. Default: 1.
+
+
+.P
+.B SSL environment variables set:
+.P
+In case
+.B sslserver
+is called with the option
+.BR \-e ,
+the following
+.I mod_ssl
+environment variables are provided:
+.TP
+.B SSL_PROTOCOL
+The SSL protocol version (SSLv2, SSLv3, TLSv1).
+.TP
+.B SSL_SESSION_ID
+The hex-encoded SSL session id.
+.TP
+.B SSL_CIPHER
+The cipher specification name.
+.TP
+.B SSL_CIPHER_USEKEYSIZE
+Number of cipher bits (actually used).
+.TP
+.B SSL_CIPHER_ALGKEYSIZE
+Number of cipher bits (possible).
+.TP
+.B SSL_VERSION_INTERFACE
+The mod_ssl program version.
+.TP
+.B SSL_VERSION_LIBRARY
+The OpenSSL program version.
+.TP
+.B SSL_CLIENT_M_VERSION
+The version of the client certificate.
+.TP
+.B SSL_CLIENT_M_SERIAL
+The serial of the client certificate.
+.TP
+.B SSL_CLIENT_S_DN
+Subject DN in client's certificate.
+.TP
+.B SSL_CLIENT_S_DN_x509
+Component of client's Subject DN.
+.TP
+.B SSL_CLIENT_I_DN
+Issuer DN of client's certificate.
+.TP
+.B SSL_CLIENT_I_DN_x509
+Component of client's Issuer DN.
+.TP
+.B SSL_CLIENT_V_START
+Validity of client's certificate (start time).
+.TP
+.B SSL_CLIENT_V_END
+Validity of client's certificate (end time).
+.TP
+.B SSL_CLIENT_A_SIG
+Algorithm used for the signature of client's certificate.
+.TP
+.B SSL_CLIENT_A_KEY
+Algorithm used for the public key of client's certificate.
+.TP
+.B SSL_CLIENT_CERT
+PEM-encoded client certificate.
+.TP
+.B SSL_CLIENT_CERT_CHAIN \fIn
+PEM-encoded certificates in client certificate chain.
+.TP
+.B SSL_CLIENT_VERIFY
+NONE, SUCCESS, GENEROUS or FAILED:reason.
+.TP
+.B SSL_SERVER_M_SERIAL
+The serial of the server certificate.
+.TP
+.B SSL_SERVER_S_DN
+Subject DN in server's certificate.
+.TP
+.B SSL_SERVER_S_DN_x509
+Component of server's Subject DN.
+.TP
+.B SSL_SERVER_I_DN
+Issuer DN of server's certificate.
+.TP
+.B SSL_SERVER_I_DN_x509
+Component of server's Issuer DN.
+.TP
+.B SSL_SERVER_V_START
+Validity of server's certificate (start time).
+.TP
+.B SSL_SERVER_V_END
+Validity of server's certificate (end time).
+.TP
+.B SSL_SERVER_A_SIG
+Algorithm used for the signature of server's certificate.
+.TP
+.B SSL_SERVER_A_KEY
+Algorithm used for the public key of server's certificate.
+.TP
+.B SSL_SERVER_CERT
+PEM-encoded server certificate.
+.P
+For $SSL_CLIENT_x_DN_x509 and $SSL_SERVER_x_DN_x509,
+x509 denotes a component of the DN:
+C, ST, L, O, OU, CN, T, I, G, S, D, UID, Email.
+
+.SH SEE ALSO
+sslclient(1),
+sslconnect(1),
+sslcat(1),
+https@(1),
+ucspi-tls(2),
+tcprules(1),
+tcprulescheck(1),
+tcp-environ(5).
+
+http://httpd.apache.org/docs/2.0/mod/mod_ssl.html
