@@ -6,4 +6,6 @@ extern unsigned int ip4_fmt(char *,const char *);
 
 #define IP4_FMT 20
 
+extern const char ip4loopback[4]; /* = {127,0,0,1}; */
+
 #endif
