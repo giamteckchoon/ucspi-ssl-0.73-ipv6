@@ -5,7 +5,7 @@
 #include "byte.h"
 #include "socket.h"
 
-int socket_bind4(int s,char ip[4],uint16 port)
+int socket_bind4(int s,const char ip[4],uint16 port)
 {
   struct sockaddr_in sa;
 
@@ -17,7 +17,7 @@ int socket_bind4(int s,char ip[4],uint16 port)
   return bind(s,(struct sockaddr *) &sa,sizeof sa);
 }
 
-int socket_bind4_reuse(int s,char ip[4],uint16 port)
+int socket_bind4_reuse(int s,const char ip[4],uint16 port)
 {
   int opt = 1;
   setsockopt(s,SOL_SOCKET,SO_REUSEADDR,&opt,sizeof opt);
