@@ -64,7 +64,7 @@ static int doit(void (*callback)(char *,unsigned int),char *ip,char *host,char *
 
   if (!stralloc_copys(&rules_name,ip)) return -1;
   while (rules_name.len > 0) {
-    if (ip[rules_name.len - 1] == '.') {
+    if (ip[rules_name.len - 1] == '.' || ip[rules_name.len - 1] == ':') {
       r = dorule(callback);
       if (r) return r;
     }
