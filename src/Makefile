@@ -719,7 +719,8 @@ sslcat \
 sslconnect \
 sslclient \
 sslserver \
-sslprint
+sslprint \
+ucspissltest
 	sh makefile.build ./default.build it it
 
 it.command: \
@@ -1305,6 +1306,8 @@ unix.a \
 auto_cafile.o \
 auto_cadir.o \
 auto_ciphers.o \
+wait_nohang.o \
+ucspitls_master.o \
 socket.lib \
 ssl.lib
 	sh makefile.build ./default.build sslclient sslclient
@@ -1510,6 +1513,9 @@ auto_ciphers.o \
 rules.o \
 remoteinfo6.o \
 timeoutconn6.o \
+wait_nohang.o \
+ucspitls_master.o \
+ucspitls.o \
 cdb.a \
 ssl.a \
 unix.a \
@@ -1553,6 +1559,7 @@ stralloc.h \
 iopause.h \
 uint32.h \
 uint64.h \
+ucspitls.h \
 tai.h \
 taia.h \
 dns.h \
@@ -2260,3 +2267,39 @@ default.o.build \
 compile \
 socket_v6loopback.c
 	sh makefile.build ./default.o.build socket_v6loopback.o socket_v6loopback
+
+ucspissltest.o: \
+default.o.build \
+compile \
+ucspissltest.c \
+ucspitls.h
+	sh makefile.build ./default.o.build ucspissltest.o ucspissltest
+
+ucspitls.o: \
+default.o.build \
+compile \
+ucspitls.c \
+ucspitls.h
+	sh makefile.build ./default.o.build ucspitls.o ucspitls
+
+ucspitls_master.o: \
+default.o.build \
+compile \
+ucspitls_master.c \
+ucspitls_master.h \
+wait.h strerr.h
+	sh makefile.build ./default.o.build ucspitls_master.o ucspitls_master
+
+ucspissltest: \
+default.build \
+ucspissltest=x \
+load \
+ucspissltest.o \
+ucspitls.o \
+sgetopt.o \
+sgetopt.h \
+subgetopt.h \
+subgetopt.o \
+buffer.o \
+buffer_2.o
+	sh makefile.build ./default.build ucspissltest ucspissltest

@@ -8,6 +8,9 @@ auto_ciphers.o
 rules.o
 remoteinfo6.o
 timeoutconn6.o
+wait_nohang.o
+ucspitls_master.o
+ucspitls.o
 cdb.a
 ssl.a
 unix.a

@@ -5,5 +5,7 @@ unix.a
 auto_cafile.o
 auto_cadir.o
 auto_ciphers.o
+wait_nohang.o
+ucspitls_master.o
 socket.lib
 ssl.lib
