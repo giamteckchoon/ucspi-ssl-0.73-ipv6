@@ -1,0 +1,46 @@
+* Adds privilege seperation to SSL.  All SSL operations can now be
+  done inside a chroot jail, with a dedicated UID and GID.  To enable
+  this:
+
+  + Set the SSL_CHROOT environment variable to the chroot directory.
+  + Set the SSL_UID environment variable to the UID for SSL operations.
+  + Set the SSL_GID environment variable to the GID for SSL operations.
+
+* The -n flag (mnemonic: "Not yet...") asks ucspi-ssl to wait to turn
+  on SSL.  It opens up a SSL control file descriptor, whose number will
+  be in the environment variable SSLCTLFD.  After requesting that SSL be
+  activated, the file descriptor in SSLREADFD can be used for reading
+  the decrypted end of the SSL connection, and SSLWRITEFD can be used
+  to send plaintext to be encrypted and sent out over the network.
+
+  SSLCTLFD takes one-character commands.  Currently two commands are
+  recognized:
+
+    * y: Start SSL.  No response is sent.
+
+    * Y: Start SSL and send connection info.  An environment string is
+      sent back as a response.  This consists of zero or more
+      VAR=val\0 strings, terminated by an extra \0.  For example:
+
+        SSLVERSION=1.0\0SSLINFO=activated\0\0
+
+      You should be able to append this directly to the environment.
+      No pipelining is allowed, so you should be able to read until
+      you find \0\0,with no concerns about reading too many
+      characters.
+
+* Removes the -a (drop privs after reading SSL certs).  SSL certs are
+  now always read with root privs enabled, since we have to keep our
+  privileges to do chroot and switch UIDs.  I haven't been able to think
+  of a way around this.
+
+* Adds a pathexec_multienv function to add multiple environment
+  variables at once.
+
+THANKS to:
+
+  * Charlie Brady <charlieb@budge.apana.org.au> for help in designing the UCSPI-TLS
+    specification.
+
+  * Yury Tarasievich <grog@grsu.by> for an early port to ucspi-ssl 0.70; I've
+    stolen some of his ideas.
