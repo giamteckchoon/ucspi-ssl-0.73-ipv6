@@ -59,7 +59,7 @@ int flagtcpenv = 0;
 int flagsslwait = 0;
 unsigned long timeout = 26;
 unsigned long ssltimeout = 26;
-unsigned int progtimeout = 3600;
+static struct ssl_io_opt io_opt;
 
 uint32 netif = 0;
 static stralloc tcpremoteinfo;
@@ -280,7 +280,7 @@ void doit(int t) {
         strerr_die2sys(111, DROP, "Error closing SSL control socket: ");
       }
 
-      if (ssl_io(ssl,pi[1],po[0],3600) != 0)
+      if (ssl_io(ssl,pi[1],po[0],io_opt) != 0)
         strerr_die3x(111,DROP,"unable to speak SSL: ",ssl_error_str(ssl_errno));
       if (wait_nohang(&wstat) > 0)
         _exit(wait_exitcode(wstat));
@@ -570,8 +570,11 @@ int main(int argc,char * const *argv) {
   unsigned long u;
   int s;
   int t;
- 
-  while ((opt = getopt(argc,argv,"46dDvqQhHrR1UXx:t:T:u:g:l:b:B:c:Z:pPoO3IiEeSsaAw:nNyY")) != opteof)
+
+  io_opt = ssl_io_opt_default;
+  io_opt.timeout = 3600;
+
+  while ((opt = getopt(argc,argv,"46dDvqQhHrR1UXx:t:T:u:g:l:b:B:c:Z:pPoO3IiEeSsaAw:nNyYuUjJ")) != opteof)
     switch(opt) {
       case 'b': scan_ulong(optarg,&backlog); break;
       case 'c': scan_ulong(optarg,&limit); break;
@@ -593,7 +596,7 @@ int main(int argc,char * const *argv) {
       case 'r': flagremoteinfo = 1; break;
       case 't': scan_ulong(optarg,&timeout); break;
       case 'T': scan_ulong(optarg,&ssltimeout); break;
-      case 'w': scan_uint(optarg,&progtimeout); break;
+      case 'w': scan_uint(optarg,&io_opt.timeout); break;
       case 'U': x = env_get("UID"); if (x) scan_ulong(x,&uid);
 		x = env_get("GID"); if (x) scan_ulong(x,&gid); break;
       case 'u': scan_ulong(optarg,&uid); break;
@@ -612,6 +615,8 @@ int main(int argc,char * const *argv) {
       case 'e': flagtcpenv = 1; break;
       case 'n': case 'y': flagsslwait = 1; break;
       case 'N': case 'Y': flagsslwait = 0; break;
+      case 'j': io_opt.just_shutdown = 1; break;
+      case 'J': io_opt.just_shutdown = 0; break;
       default: usage();
     }
   argc -= optind;

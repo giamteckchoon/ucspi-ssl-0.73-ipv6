@@ -78,7 +78,7 @@ int flagtcpenv = 0;
 int flagsslwait = 0;
 unsigned long itimeout = 26;
 unsigned long ctimeout[2] = { 2, 58 };
-unsigned int progtimeout = 3600;
+struct ssl_io_opt io_opt;
 uint32 netif = 0;
 
 char iplocal[16] = { 0,0,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,0 };
@@ -207,13 +207,16 @@ int main(int argc,char * const *argv) {
   stralloc ssl_env = { 0 };
   buffer ssl_env_buf;
 
+  io_opt = ssl_io_opt_default;
+  io_opt.timeout = 3600;
+
   dns_random_init(seed);
 
   close(6);
   close(7);
   sig_ignore(sig_pipe);
  
-  while ((opt = getopt(argc,argv,"46dDvqQhHrRi:p:t:T:l:a:A:c:C:k:V:Z:3eEsSnN0xXw:yY")) != opteof)
+  while ((opt = getopt(argc,argv,"46dDvqQhHrRi:p:t:T:l:a:A:c:C:k:V:Z:3eEsSnN0xXw:yYjJ")) != opteof)
     switch(opt) {
       case '4': noipv6 = 1; break;
       case '6': forcev6 = 1; break;
@@ -232,7 +235,7 @@ int main(int argc,char * const *argv) {
 		if (optarg[j] == '+') ++j;
 		scan_ulong(optarg + j,&ctimeout[1]);
 		break;
-      case 'w': scan_uint(optarg,&progtimeout); break;
+      case 'w': scan_uint(optarg,&io_opt.timeout); break;
       case 'i': if (!scan_ip6(optarg,iplocal)) usage(); break;
       case 'Z': netif=socket_getifidx(optarg); break;
       case 'p': scan_ulong(optarg,&u); portlocal = u; break;
@@ -253,6 +256,8 @@ int main(int argc,char * const *argv) {
       case 'X': flagservercert = 0; break;
       case 'y': flagsslwait = 1; break;
       case 'Y': flagsslwait = 0; break;
+      case 'j': io_opt.just_shutdown = 1; break;
+      case 'J': io_opt.just_shutdown = 0; break;
       default: usage();
     }
   argv += optind;
@@ -464,7 +469,7 @@ int main(int argc,char * const *argv) {
       if (verbosity >= 2)
 	strerr_warn1("sslclient: ssl_io starting",0);
       
-      if (ssl_io(ssl,pi[1],po[0],progtimeout)) {
+      if (ssl_io(ssl,pi[1],po[0],io_opt)) {
 	strerr_warn2(FATAL,"unable to speak SSL:",&strerr_sys);
 	ssl_error(error_warn);
 	ssl_close(ssl);
